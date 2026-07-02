@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What Makes You Tick - Interactive Character Assessment</title>
+    <style>
+        :root {
+            --bg-color: #fafaf9;
+            --card-bg: #ffffff;
+            --text-main: #1c1917;
+            --text-muted: #57534e;
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --primary-light: #ccfbf1;
+            --border: #e7e5e4;
+            --border-hover: #d6d3d1;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --accent-purple: #7c3aed;
+            --accent-orange: #ea580c;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.04), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 3rem 1.5rem;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .progress-wrapper {
+            background: var(--card-bg);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.03);
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-meta {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .progress-track-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #f5f5f4;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+
+        .progress-container {
+            background-color: #e7e5e4;
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary) 0%, #2dd4bf 100%);
+            height: 100%;
+            width: 33.3%;
+            border-radius: 9999px;
+            transition: var(--transition);
+        }
+
+        .wizard-container {
+            position: relative;
+            min-height: 350px;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-meta {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 1.75rem;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option-item {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            padding: 1.25rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: var(--card-bg);
+        }
+
+        .option-item:hover {
+            border-color: var(--border-hover);
+            background-color: #fafaf9;
+        }
+
+        .option-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .custom-radio {
+            position: relative;
+            height: 20px;
+            width: 20px;
+            background-color: transparent;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            margin-right: 1rem;
+            margin-top: 0.2rem;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .option-item:hover .custom-radio {
+            border-color: var(--border-hover);
+        }
+
+        .option-item input[type="radio"]:checked ~ .custom-radio {
+            border-color: var(--primary);
+            background-color: var(--primary);
+        }
+
+        .option-item input[type="radio"]:checked ~ .custom-radio::after {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .option-item.selected-chip {
+            border-color: var(--primary);
+            background-color: #f0fdfa;
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .option-label {
+            font-size: 1rem;
+            color: var(--text-main);
+            user-select: none;
+            line-height: 1.5;
+        }
+
+        .other-field-wrapper {
+            width: 100%;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        .option-item.selected-chip .other-field-wrapper {
+            display: block;
+        }
+
+        .other-input {
+            width: 100%;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            outline: none;
+            background-color: var(--card-bg);
+            transition: var(--transition);
+            color: var(--text-main);
+        }
+
+        .other-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.75rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .back-btn {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+        }
+
+        .back-btn:hover {
+            color: var(--text-main);
+            border-color: var(--border-hover);
+            background-color: #f5f5f4;
+        }
+
+        .next-btn {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.2);
+            margin-left: auto;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .next-btn:disabled {
+            background-color: #e7e5e4;
+            color: #a8a29e;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .results-card {
+            background: var(--card-bg);
+            border: 2px solid var(--text-main);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.1);
+            display: none;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            border-bottom: 2px solid #f5f5f4;
+            padding-bottom: 0.75rem;
+        }
+
+        .outcome-badge {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-thinker { background-color: #e0f2fe; color: #0369a1; }
+        .badge-action { background-color: #fef3c7; color: #b45309; }
+        .badge-connector { background-color: #f3e8ff; color: #6b21a8; }
+        .badge-explorer { background-color: #ffedd5; color: #c2410c; }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .style-tag {
+            background-color: #f5f5f4;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid #e7e5e4;
+        }
+
+        .block-section {
+            background-color: #fafaf9;
+            padding: 1.75rem;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            color: var(--text-main);
+            border-left: 5px solid var(--primary);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .block-section.purple-theme {
+            border-left-color: var(--accent-purple);
+        }
+
+        .block-section h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .reset-btn {
+            background-color: var(--text-main);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .reset-btn:hover {
+            background-color: #292524;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>What Makes You Tick</h1>
+        <p>A simple, interactive test to discover your style, character, and traits.</p>
+    </header>
+
+    <div class="progress-wrapper" id="progressWrapper">
+        <div class="progress-header">
+            <div class="progress-meta" id="progressText">Question 1 of 3</div>
+            <div class="progress-track-name" id="trackName">Setting Up</div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Active Question Card Area -->
+    <div class="wizard-container">
+        <form id="wizardForm" onsubmit="return false;">
+            <div id="active-question-wrapper">
+                <!-- Programmatically populated by script engine -->
+            </div>
+
+            <div class="nav-container">
+                <button type="button" class="nav-btn back-btn" id="backBtn" style="display: none;">Back</button>
+                <button type="button" class="nav-btn next-btn" id="nextBtn" disabled="disabled">Next</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tailormade Result Card -->
+    <div id="resultsCard" class="results-card">
+        <div id="outcomeBadge" class="outcome-badge">Personality Profile</div>
+        <h2 id="outcomeTitle">Your Custom Evaluation</h2>
+        
+        <div class="tag-container" id="tagWrapper">
+            <!-- Programmatically populated style-tags -->
+        </div>
+
+        <div class="block-section" id="superpowerSection">
+            <h3>Your Superpower</h3>
+            <p id="superpowerText"></p>
+        </div>
+
+        <div class="block-section purple-theme" id="challengeSection">
+            <h3>Your Daily Challenge</h3>
+            <p id="challengeText"></p>
+        </div>
+
+        <button type="button" class="reset-btn" id="resetBtn">Take It Again</button>
+    </div>
+</div>
+
+<script>
+/*<![CDATA[*/
+    document.addEventListener("DOMContentLoaded", function() {
+        const steps = {
+            "start": {
+                meta: "Step 1: The Gateway",
+                text: "What is your default setup when you wake up on a completely free Saturday morning?",
+                track: "First Choice",
+                options: [
+                    { label: "Quietly stay in. Let's read, think, or work on a solo hobby.", val: "A", next: "thinker_q2" },
+                    { label: "Get things done. Let's tackle tasks, organize, or plan something.", val: "B", next: "action_q2" },
+                    { label: "Reach out to people. Let's call a friend, gather people, or hang out.", val: "C", next: "connector_q2" },
+                    { label: "See where the day goes. Let's explore, wander, or be spontaneous.", val: "D", next: "explorer_q2" }
+                ]
+            },
+
+            // Path 1: Quiet Thinker Track
+            "thinker_q2": {
+                meta: "Step 2: Quiet Thinker Track",
+                text: "When you have a big personal decision to make, how does your brain usually tackle it?",
+                track: "Quiet Thinker",
+                options: [
+                    { label: "I research everything, write out pros/cons, and logically map it.", val: "A", next: "thinker_q3" },
+                    { label: "I quietly sleep on it and wait for a clear gut feeling to guide me.", val: "B", next: "thinker_q3" },
+                    { label: "Other (How do you usually process decisions?):", val: "C", next: "thinker_q3", isOther: true }
+                ]
+            },
+            "thinker_q3": {
+                meta: "Step 3: Quiet Thinker Track",
+                text: "How do you recharge after a tough, exhausting week?",
+                track: "Quiet Thinker",
+                options: [
+                    { label: "Total, uninterrupted silence. Spending time completely by myself.", val: "A", next: "results" },
+                    { label: "Working on a creative project, game, or deep reading on a new topic.", val: "B", next: "results" },
+                    { label: "Other (What is your perfect recharge activity?):", val: "C", next: "results", isOther: true }
+                ]
+            },
+
+            // Path 2: Action-Taker Track
+            "action_q2": {
+                meta: "Step 2: Action-Taker Track",
+                text: "What drives you crazy the most in a group project or family task?",
+                track: "Action-Taker",
+                options: [
+                    { label: "When everything moves slowly and people drag their feet.", val: "A", next: "action_q3" },
+                    { label: "Disorganization and messy plans that constantly change.", val: "B", next: "action_q3" },
+                    { label: "Other (What is your biggest pet peeve?):", val: "C", next: "action_q3", isOther: true }
+                ]
+            },
+            "action_q3": {
+                meta: "Step 3: Action-Taker Track",
+                text: "When you finally finish a major goal, what does your mind do?",
+                track: "Action-Taker",
+                options: [
+                    { label: "I feel proud, but I immediately start looking for the next thing to conquer.", val: "A", next: "results" },
+                    { label: "I feel relaxed and relieved to cross it off. I am ready for a solid rest.", val: "B", next: "results" },
+                    { label: "Other (How do you handle finishing a big task?):", val: "C", next: "results", isOther: true }
+                ]
+            },
+
+            // Path 3: Warm Connector Track
+            "connector_q2": {
+                meta: "Step 2: Warm Connector Track",
+                text: "When a close friend is going through a hard time, what is your immediate move?",
+                track: "Warm Connector",
+                options: [
+                    { label: "I show warm sympathy, bring them food, and just listen without judging.", val: "A", next: "connector_q3" },
+                    { label: "I jump into helper mode and brainstorm practical solutions to fix it.", val: "B", next: "connector_q3" },
+                    { label: "Other (How do you usually show support?):", val: "C", next: "connector_q3", isOther: true }
+                ]
+            },
+            "connector_q3": {
+                meta: "Step 3: Warm Connector Track",
+                text: "In a room full of people, what environment makes you feel the most comfortable?",
+                track: "Warm Connector",
+                options: [
+                    { label: "A cozy, quiet one-on-one deep talk in the corner of the room.", val: "A", next: "results" },
+                    { label: "Being right in the center, keeping the mood fun and light for everyone.", val: "B", next: "results" },
+                    { label: "Other (What is your ideal social setting?):", val: "C", next: "results", isOther: true }
+                ]
+            },
+
+            // Path 4: Spontaneous Explorer Track
+            "explorer_q2": {
+                meta: "Step 2: Spontaneous Explorer Track",
+                text: "Which of these sounds like the absolute perfect spontaneous trip to you?",
+                track: "Spontaneous Explorer",
+                options: [
+                    { label: "A last-minute road trip with a bag packed but absolutely no destination set.", val: "A", next: "explorer_q3" },
+                    { label: "Checking out a brand new local spot, event, or unique restaurant tonight.", val: "B", next: "explorer_q3" },
+                    { label: "Other (What is your idea of a perfect adventure?):", val: "C", next: "explorer_q3", isOther: true }
+                ]
+            },
+            "explorer_q3": {
+                meta: "Step 3: Spontaneous Explorer Track",
+                text: "How do you honestly feel about strict daily routines, rules, or schedules?",
+                track: "Spontaneous Explorer",
+                options: [
+                    { label: "I look for creative shortcuts or find ways to bend them to fit my style.", val: "A", next: "results" },
+                    { label: "I tolerate them, but internally I am daydreaming and ready for a break.", val: "B", next: "results" },
+                    { label: "Other (How do you handle strict rules?):", val: "C", next: "results", isOther: true }
+                ]
+            }
+        };
+
+        // State Machine Tracking Variables
+        let currentStepId = "start";
+        let pathHistory = [];
+        let answers = {};
+
+        const wrapper = document.getElementById("active-question-wrapper");
+        const backBtn = document.getElementById("backBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const progressWrapper = document.getElementById("progressWrapper");
+        const progressBar = document.getElementById("progressBar");
+        const progressText = document.getElementById("progressText");
+        const trackName = document.getElementById("trackName");
+        const resultsCard = document.getElementById("resultsCard");
+
+        function renderStep() {
+            const step = steps[currentStepId];
+            if (!step) return;
+
+            const totalSteps = 3;
+            const stepIndex = pathHistory.length + 1;
+            const percent = (stepIndex / totalSteps) * 100;
+            progressBar.style.width = `${percent}%`;
+            progressText.innerText = `Question ${stepIndex} of ${totalSteps}`;
+            trackName.innerText = step.track;
+
+            let html = `
+                <div class="question-card active">
+                    <div class="question-meta">${step.meta}</div>
+                    <div class="question-text">${step.text}</div>
+                    <div class="options-list">
+            `;
+
+            step.options.forEach((opt) => {
+                const checked = (answers[currentStepId] && answers[currentStepId].val === opt.val) ? 'checked="checked"' : '';
+                const selectedClass = checked ? 'selected-chip' : '';
+                const textVal = (answers[currentStepId] && answers[currentStepId].otherText) ? answers[currentStepId].otherText : '';
+
+                if (opt.isOther) {
+                    html += `
+                        <label class="option-item ${selectedClass}">
+                            <input type="radio" name="options" value="${opt.val}" data-next="${opt.next}" ${checked} />
+                            <div class="custom-radio"></div>
+                            <div class="option-label" style="width: 100%;">
+                                ${opt.label}
+                                <div class="other-field-wrapper">
+                                    <input type="text" class="other-input" placeholder="Tell us how you handle this..." value="${textVal}" />
+                                </div>
+                            </div>
+                        </label>
+                    `;
+                } else {
+                    html += `
+                        <label class="option-item ${selectedClass}">
+                            <input type="radio" name="options" value="${opt.val}" data-next="${opt.next}" ${checked} />
+                            <div class="custom-radio"></div>
+                            <span class="option-label">${opt.label}</span>
+                        </label>
+                    `;
+                }
+            });
+
+            html += `</div></div>`;
+            wrapper.innerHTML = html;
+
+            // Wire up item clicks to dynamically enable buttons
+            const listItems = wrapper.querySelectorAll(".option-item");
+            listItems.forEach(item => {
+                const radio = item.querySelector('input[type="radio"]');
+                const textInput = item.querySelector('.other-input');
+
+                radio.addEventListener("change", function() {
+                    listItems.forEach(el => el.classList.remove("selected-chip"));
+                    item.classList.add("selected-chip");
+                    if (textInput) {
+                        textInput.focus();
+                    }
+                    nextBtn.disabled = false;
+                });
+
+                if (textInput) {
+                    textInput.addEventListener("input", function() {
+                        if (!radio.checked) {
+                            radio.checked = true;
+                            listItems.forEach(el => el.classList.remove("selected-chip"));
+                            item.classList.add("selected-chip");
+                        }
+                        nextBtn.disabled = this.value.trim() === "";
+                    });
+                }
+            });
+
+            // Set back button state visibility
+            backBtn.style.display = pathHistory.length > 0 ? "block" : "none";
+            
+            // Re-verify current selections
+            const checkedRadio = wrapper.querySelector('input[name="options"]:checked');
+            if (checkedRadio) {
+                if (checkedRadio.value === "C") {
+                    const textInput = checkedRadio.closest(".option-item").querySelector(".other-input");
+                    nextBtn.disabled = !textInput || textInput.value.trim() === "";
+                } else {
+                    nextBtn.disabled = false;
+                }
+            } else {
+                nextBtn.disabled = true;
+            }
+        }
+
+        nextBtn.addEventListener("click", function() {
+            const checkedRadio = wrapper.querySelector('input[name="options"]:checked');
+            if (!checkedRadio) return;
+
+            const val = checkedRadio.value;
+            const nextStep = checkedRadio.getAttribute("data-next");
+            const otherInput = checkedRadio.closest(".option-item").querySelector(".other-input");
+            const otherText = otherInput ? otherInput.value.trim() : "";
+
+            answers[currentStepId] = { val: val, otherText: otherText, nextStep: nextStep };
+            pathHistory.push(currentStepId);
+
+            if (nextStep === "results") {
+                renderResults();
+            } else {
+                currentStepId = nextStep;
+                renderStep();
+            }
+        });
+
+        backBtn.addEventListener("click", function() {
+            if (pathHistory.length === 0) return;
+            currentStepId = pathHistory.pop();
+            renderStep();
+        });
+
+        function renderResults() {
+            document.querySelector(".wizard-container").style.display = "none";
+            progressWrapper.style.display = "none";
+
+            const badge = document.getElementById("outcomeBadge");
+            const title = document.getElementById("outcomeTitle");
+            const tagWrapper = document.getElementById("tagWrapper");
+            const superpower = document.getElementById("superpowerText");
+            const challenge = document.getElementById("challengeText");
+
+            const route = answers["start"].val;
+            
+            let badgeClass = "badge-thinker";
+            let badgeText = "Quiet Thinker";
+            let profileTitle = "The Thoughtful Planner";
+            let tags = ["Focused", "Thoughtful", "Observant", "Creative", "Calm", "Reflective", "Loyal", "Independent", "Deep", "Patient"];
+            let superpowerPara = "You can cut through a world of noise to find deep focus. When others are rushed, you have the unique ability to step back, read the situation, and see paths they missed. Your quiet presence acts as a powerful grounding anchor for anyone around you.";
+            let challengePara = "Overthinking can easily lead to planning paralysis. Because you see so many variables, it is easy to get stuck in your own head and wait too long to make a move. Challenge yourself to pick a direction and take the first small step before you feel 100% ready.";
+
+            if (route === "A") {
+                const subChoice = answers["thinker_q2"].val;
+                if (subChoice === "A") {
+                    profileTitle = "The Mastermind Mindset";
+                    tags = ["Analytical", "Strategic", "Precise", "Careful", "Observant", "Independent", "Structured", "Quiet", "Intelligent", "Self-Reliant"];
+                } else if (subChoice === "B") {
+                    profileTitle = "The Wise Dreamer";
+                    tags = ["Intuitive", "Calm", "Imaginative", "Reflective", "Empathetic", "Private", "Deep", "Peaceful", "Thoughtful", "Artist"];
+                    superpowerPara = "You possess a powerful intuitive core. You don't need a spreadsheet to know the right path; you rely on deep-seated emotional wisdom and gut feelings that usually turn out to be exactly right.";
+                } else {
+                    profileTitle = "The Unique Individualist";
+                    tags = ["Adaptive", "Reflective", "Custom", "Inventive", "Observant", "Quirky", "Sincere", "Independent", "Calm", "True"];
+                }
+            } 
+            else if (route === "B") {
+                badgeClass = "badge-action";
+                badgeText = "Action-Taker";
+                profileTitle = "The Determined Builder";
+                tags = ["Organized", "Determined", "Efficient", "Bold", "Practical", "Reliable", "Direct", "Structured", "Decisive", "Strong"];
+                superpowerPara = "You don't just dream—you deliver. You have a rare, relentless internal engine that can take a messy, chaotic idea and break it down into clean, actionable steps. You get things done when others are still talking about it.";
+                challengePara = "You can burn yourself out by turning everything into a job. Because you find peace in crossing things off, you might struggle to sit still and simply enjoy the moment. Remember that rest is productive, too.";
+
+                const subChoice = answers["action_q2"].val;
+                if (subChoice === "A") {
+                    profileTitle = "The Direct Accelerator";
+                    tags = ["Fast-Paced", "Impatient", "Effective", "Decisive", "Direct", "Ambitious", "Driven", "Task-Focused", "Practical", "Bold"];
+                } else if (subChoice === "B") {
+                    profileTitle = "The Detail Architect";
+                    tags = ["Systematic", "Neat", "Organized", "Planning-Focused", "Structured", "Reliable", "Precise", "Efficient", "Solid", "Leader"];
+                }
+            } 
+            else if (route === "C") {
+                badgeClass = "badge-connector";
+                badgeText = "Warm Connector";
+                profileTitle = "The Heart of the Group";
+                tags = ["Warm", "Empathetic", "Kind", "Caring", "Social", "Helpful", "Loyal", "Friendly", "Generous", "Approachable"];
+                superpowerPara = "You possess an exceptional emotional intelligence. You instantly notice how others feel and make them feel safe, heard, and valued. Your kindness isn't just nice—it is a superpower that builds strong, unbreakable relationships.";
+                challengePara = "You are highly prone to people-pleasing and taking on everyone else's stress. When you spend all your energy filling other people's cups, yours runs empty. Remember that saying 'no' to others is how you say 'yes' to yourself.";
+
+                const subChoice = answers["connector_q2"].val;
+                if (subChoice === "A") {
+                    profileTitle = "The Intuitive Empath";
+                    tags = ["Understanding", "Soft-Hearted", "Gentle", "Comforting", "Patient", "Compassionate", "Sensitive", "Warm", "Loyal", "Listener"];
+                } else if (subChoice === "B") {
+                    profileTitle = "The Supportive Rock";
+                    tags = ["Helpful", "Action-Oriented", "Reliable", "Fixer", "Supportive", "Practical", "Generous", "Dedicated", "Kind", "Solid"];
+                }
+            } 
+            else if (route === "D") {
+                badgeClass = "badge-explorer";
+                badgeText = "Spontaneous Explorer";
+                profileTitle = "The Free Spirit";
+                tags = ["Spontaneous", "Witty", "Fun", "Bold", "Curious", "Flexible", "Energetic", "Independent", "Open-Minded", "Playful"];
+                superpowerPara = "You bring color, life, and energy wherever you go. Your ability to live fully in the present moment makes you incredibly resilient and creative. You are not afraid of change; you thrive on it.";
+                challengePara = "Sustaining long-term routines can feel like a chore. You love the initial excitement of starting something new, but you struggle with the boring day-to-day work required to finish it. Challenge yourself to stick with a goal even after the novelty wears off.";
+
+                const subChoice = answers["explorer_q2"].val;
+                if (subChoice === "A") {
+                    profileTitle = "The Bold Trailblazer";
+                    tags = ["Adventurous", "Wild", "Daring", "Flexible", "Fun-Loving", "Brave", "Independent", "Energetic", "Curious", "Quick"];
+                } else if (subChoice === "B") {
+                    profileTitle = "The Curious Curator";
+                    tags = ["Artistic", "Curious", "Vibrant", "Expressive", "Trendy", "Social", "Adaptable", "Open", "Observer", "Joyful"];
+                }
+            }
+
+            badge.className = `outcome-badge ${badgeClass}`;
+            badge.innerText = badgeText;
+            title.innerText = profileTitle;
+            superpower.innerText = superpowerPara;
+            challenge.innerText = challengePara;
+
+            let tagsHtml = "";
+            tags.forEach(tag => {
+                tagsHtml += `<span class="style-tag">${tag}</span>`;
+            });
+            tagWrapper.innerHTML = tagsHtml;
+
+            resultsCard.style.display = "block";
+            resultsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        // Reset system to baseline start point
+        document.getElementById("resetBtn").addEventListener("click", function() {
+            currentStepId = "start";
+            pathHistory = [];
+            answers = {};
+            
+            resultsCard.style.display = "none";
+            document.querySelector(".wizard-container").style.display = "block";
+            progressWrapper.style.display = "flex";
+            
+            renderStep();
+        });
+
+        // Initialize state view load
+        renderStep();
+    });
+/*]]>*/
+</script>
+
+</body>
+</html>
